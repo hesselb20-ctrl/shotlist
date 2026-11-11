@@ -1,0 +1,18 @@
+{
+  "name": "shotlist",
+  "version": "0.1.0",
+  "description": "Break any short video down into a frame-accurate shot list and export it as a Remotion template.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "shotlist": "dist/index.js" },
+  "files": ["dist"],
+  "engines": { "node": ">=22" },
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "@shotlist/schema": "*",
+    "@shotlist/template": "*",
+    "commander": "^15.1.0"
+  },
+  "devDependencies": { "typescript": "^5.9.0", "@types/node": "^22.0.0" }
+}
