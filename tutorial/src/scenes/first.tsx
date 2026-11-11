@@ -22,18 +22,18 @@ export const Title: React.FC<{duration: number}> = ({duration}) => {
         opacity: exit,
       }}
     >
-      <LogoMark width={760} height={56} reveal={lerp(frame, [4, 4 + BEAT * 2], [0, 1])} />
-      <Appear at={BEAT}>
+      <LogoMark width={760} height={56} reveal={1} />
+      <Appear at={-30}>
         <div style={{fontSize: 210, fontWeight: 800, letterSpacing: '-0.05em', lineHeight: 1, marginTop: 36}}>shotlist</div>
       </Appear>
-      <Appear at={BEAT * 2}>
+      <Appear at={-30}>
         <div style={{fontSize: size.xxl, fontWeight: 600, letterSpacing: '-0.02em', marginTop: 28, lineHeight: 1.15}}>
           Any short video, broken down to the frame.
           <br />
           <span style={{color: color.accent}}>Exported as a Remotion template.</span>
         </div>
       </Appear>
-      <Appear at={BEAT * 3}>
+      <Appear at={-30}>
         <div style={{...mono, fontSize: size.md, color: color.muted, marginTop: 48, letterSpacing: '0.02em'}}>
           cuts · beats · hook · captions · pacing
         </div>
@@ -82,7 +82,7 @@ export const Problem: React.FC<{duration: number}> = ({duration}) => {
             </div>
           </Appear>
         </div>
-        <Appear at={BEAT}>
+        <Appear at={-30}>
           <ClipFrame width={barWidth} label="some ad you wish you had made">
             <Loop durationInFrames={total}>
               <Clip />
