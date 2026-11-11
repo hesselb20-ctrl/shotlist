@@ -1,0 +1,8 @@
+node_modules/
+dist/
+out/
+.DS_Store
+*.log
+.env
+tutorial/public/test-clip.mp4
+tutorial/public/bed.m4a

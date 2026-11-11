@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hesselb20-ctrl/shotlist/blob/main/schema/shotlist.schema.json",
+  "title": "Shotlist",
+  "description": "Frame-accurate breakdown of a short video: cuts, hook, beats, captions and pacing. Frame numbers are zero-based and counted at source.fps. Ranges are [startFrame, endFrame).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "generator", "source", "detection", "shots", "hook", "beats", "captions", "pacing", "analysis"],
+  "properties": {
+    "version": { "const": "1.0" },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "durationSec", "durationFrames", "fps", "width", "height", "hasAudio", "videoCodec", "audioCodec"],
+      "properties": {
+        "file": { "type": "string", "description": "File name of the analysed video, without its directory." },
+        "durationSec": { "type": "number", "exclusiveMinimum": 0 },
+        "durationFrames": { "type": "integer", "minimum": 1 },
+        "fps": { "type": "number", "exclusiveMinimum": 0 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "hasAudio": { "type": "boolean" },
+        "videoCodec": { "type": ["string", "null"] },
+        "audioCodec": { "type": ["string", "null"] }
+      }
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sceneThreshold", "minShotFrames", "beatToleranceFrames"],
+      "properties": {
+        "sceneThreshold": { "type": "number", "minimum": 0, "maximum": 1, "description": "ffmpeg scene score above which a frame counts as a cut." },
+        "minShotFrames": { "type": "integer", "minimum": 1, "description": "Cuts closer together than this are merged." },
+        "beatToleranceFrames": { "type": "integer", "minimum": 0, "description": "A cut within this many frames of an onset counts as on the beat." }
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Contiguous and in order. The first shot starts at frame 0, the last ends at source.durationFrames.",
+      "items": { "$ref": "#/$defs/shot" }
+    },
+    "hook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startFrame", "endFrame", "type", "description"],
+      "properties": {
+        "startFrame": { "type": "integer", "minimum": 0 },
+        "endFrame": { "type": "integer", "minimum": 1 },
+        "type": { "type": "string", "description": "Short name for the hook device, for example: question, result first, pattern interrupt." },
+        "description": { "type": "string" }
+      }
+    },
+    "beats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bpm", "onsets", "envelope"],
+      "properties": {
+        "bpm": { "type": ["number", "null"], "description": "Tempo estimate. Null when there is no audio or no stable pulse." },
+        "onsets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["frame", "timeSec", "strength"],
+            "properties": {
+              "frame": { "type": "integer", "minimum": 0 },
+              "timeSec": { "type": "number", "minimum": 0 },
+              "strength": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "envelope": {
+          "type": "array",
+          "description": "Loudness envelope, one value per video frame, normalised to 0..1. Empty when there is no audio.",
+          "items": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "captions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "startFrame", "endFrame", "source"],
+        "properties": {
+          "text": { "type": "string" },
+          "startFrame": { "type": "integer", "minimum": 0 },
+          "endFrame": { "type": "integer", "minimum": 1 },
+          "source": { "enum": ["subtitles", "vision"], "description": "subtitles: timed from an SRT or VTT file. vision: on-screen text read from a sampled frame and timed to its shot." }
+        }
+      }
+    },
+    "pacing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shotCount", "avgShotSec", "medianShotSec", "minShotSec", "maxShotSec", "cutsPerMinute", "cutsOnBeatRatio", "curve"],
+      "properties": {
+        "shotCount": { "type": "integer", "minimum": 1 },
+        "avgShotSec": { "type": "number" },
+        "medianShotSec": { "type": "number" },
+        "minShotSec": { "type": "number" },
+        "maxShotSec": { "type": "number" },
+        "cutsPerMinute": { "type": "number" },
+        "cutsOnBeatRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "curve": { "enum": ["accelerating", "steady", "decelerating"], "description": "Whether shots get shorter, stay even or get longer from the first half to the second." }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "model", "summary", "whyItWorks"],
+      "properties": {
+        "source": { "enum": ["claude", "heuristic"], "description": "claude: roles, labels and hook read from sampled frames. heuristic: guessed from shot position only." },
+        "model": { "type": ["string", "null"] },
+        "summary": { "type": "string" },
+        "whyItWorks": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "shot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "index", "startFrame", "endFrame", "durationFrames", "startSec", "endSec", "role", "label", "description", "slot", "cutOnBeat", "dominantColor"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^s[0-9]{2,}$" },
+        "index": { "type": "integer", "minimum": 0 },
+        "startFrame": { "type": "integer", "minimum": 0, "description": "Inclusive." },
+        "endFrame": { "type": "integer", "minimum": 1, "description": "Exclusive." },
+        "durationFrames": { "type": "integer", "minimum": 1 },
+        "startSec": { "type": "number", "minimum": 0 },
+        "endSec": { "type": "number", "exclusiveMinimum": 0 },
+        "role": { "enum": ["hook", "setup", "proof", "payoff", "cta", "other"] },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "slot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "hint"],
+          "properties": {
+            "type": { "enum": ["video", "image", "text"] },
+            "hint": { "type": "string", "description": "What to put here when you re-skin the template." }
+          }
+        },
+        "cutOnBeat": { "type": "boolean" },
+        "dominantColor": { "type": "string", "pattern": "^#[0-9a-f]{6}$" }
+      }
+    }
+  }
+}

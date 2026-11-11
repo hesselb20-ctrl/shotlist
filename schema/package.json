@@ -1,0 +1,13 @@
+{
+  "name": "@shotlist/schema",
+  "version": "0.1.0",
+  "description": "JSON Schema, TypeScript types and validator for shotlist.json",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "shotlist.schema.json", "example.shotlist.json"],
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "dependencies": { "ajv": "^8.17.1" },
+  "devDependencies": { "typescript": "^5.9.0", "@types/node": "^22.0.0" }
+}
