@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 440" width="1600" height="440" role="img" aria-labelledby="t d">
+  <title id="t">How shotlist works</title>
+  <desc id="d">A video goes into shotlist analyze, which finds cuts with ffmpeg, beats from audio onsets and the hook with Claude. The result is shotlist.json, which shotlist export turns into a Remotion template with one Sequence per shot.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#93A0B4"/>
+    </marker>
+    <style>
+      .sans { font-family: Inter, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+      .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .step { font-size: 28px; font-weight: 700; fill: #FFB224; letter-spacing: 2px; }
+      .head { font-size: 34px; font-weight: 800; fill: #F3EFE6; }
+      .body { font-size: 28px; fill: #93A0B4; }
+      .cmd  { font-size: 28px; fill: #F3EFE6; }
+      .box  { fill: #151A23; stroke: #2B3442; stroke-width: 3; }
+      .flow { stroke: #93A0B4; stroke-width: 4; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="440" rx="24" fill="#0D1017"/>
+
+  <!-- 1 · video -->
+  <text x="40" y="78" class="mono step">1 INPUT</text>
+  <rect x="40" y="108" width="280" height="232" rx="20" class="box"/>
+  <rect x="72" y="140" width="216" height="104" rx="12" fill="#1C2330" stroke="#2B3442" stroke-width="3"/>
+  <path d="M166 168 L206 192 L166 216 Z" fill="#F3EFE6"/>
+  <text x="72" y="292" class="sans head">Any video</text>
+  <text x="72" y="326" class="sans body">ad, TikTok, trailer</text>
+
+  <path d="M328 224 H392" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- 2 · analyze -->
+  <text x="400" y="78" class="mono step">2 ANALYZE</text>
+  <rect x="400" y="108" width="470" height="232" rx="20" class="box"/>
+  <rect x="430" y="140" width="10" height="46" rx="5" fill="#FF6B5E"/>
+  <text x="458" y="173" class="sans head">cuts</text>
+  <text x="566" y="173" class="sans body">ffmpeg scene score</text>
+  <rect x="430" y="202" width="10" height="46" rx="5" fill="#4CC9F0"/>
+  <text x="458" y="235" class="sans head">beats</text>
+  <text x="566" y="235" class="sans body">audio onsets</text>
+  <rect x="430" y="264" width="10" height="46" rx="5" fill="#FFB224"/>
+  <text x="458" y="297" class="sans head">hook</text>
+  <text x="566" y="297" class="sans body">Claude on frames</text>
+  <text x="400" y="392" class="mono cmd"><tspan fill="#FFB224">$ </tspan>shotlist analyze ad.mp4</text>
+
+  <path d="M878 224 H942" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- 3 · shotlist.json -->
+  <text x="950" y="78" class="mono step">3 SHOT LIST</text>
+  <rect x="950" y="108" width="280" height="232" rx="20" class="box"/>
+  <text x="978" y="168" class="mono" font-size="30" font-weight="700" fill="#6EE7A0">shotlist.json</text>
+  <text x="978" y="222" class="sans body">shots, hook,</text>
+  <text x="978" y="260" class="sans body">beats, captions,</text>
+  <text x="978" y="298" class="sans body">pacing</text>
+
+  <path d="M1238 224 H1302" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- 4 · template -->
+  <text x="1310" y="78" class="mono step">4 EXPORT</text>
+  <rect x="1310" y="108" width="250" height="232" rx="20" class="box"/>
+  <text x="1338" y="166" class="sans head">Remotion</text>
+  <text x="1338" y="204" class="sans head">template</text>
+  <rect x="1338" y="232" width="22" height="34" rx="6" fill="#FF6B5E"/>
+  <rect x="1364" y="232" width="52" height="34" rx="6" fill="#4CC9F0"/>
+  <rect x="1420" y="232" width="62" height="34" rx="6" fill="#A78BFA"/>
+  <rect x="1486" y="232" width="20" height="34" rx="6" fill="#6EE7A0"/>
+  <rect x="1510" y="232" width="24" height="34" rx="6" fill="#FFB224"/>
+  <text x="1338" y="312" class="sans body">a slot per shot</text>
+  <text x="1040" y="392" class="mono cmd"><tspan fill="#FFB224">$ </tspan>shotlist export shotlist.json</text>
+</svg>
