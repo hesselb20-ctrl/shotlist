@@ -1,0 +1,13 @@
+{
+  "name": "@shotlist/template",
+  "version": "0.1.0",
+  "description": "Turns a shotlist.json into a Remotion project with one Sequence per shot",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "scaffold"],
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "dependencies": { "@shotlist/schema": "*" },
+  "devDependencies": { "typescript": "^5.9.0", "@types/node": "^22.0.0" }
+}
