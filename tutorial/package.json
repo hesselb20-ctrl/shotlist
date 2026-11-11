@@ -1,0 +1,26 @@
+{
+  "name": "@shotlist/tutorial",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remotion project that renders the shotlist tutorial video and the README images",
+  "scripts": {
+    "assets": "node scripts/assets.mjs",
+    "dev": "npm run assets && remotion studio",
+    "typecheck": "tsc --noEmit",
+    "render": "npm run assets && remotion render Tutorial ../media/tutorial.mp4",
+    "gif": "node scripts/gif.mjs",
+    "stills": "npm run assets && remotion still Hero ../media/hero.png && remotion still Timeline ../media/timeline.png && remotion still BeforeAfter ../media/before-after.png --frame=232",
+    "media": "npm run render && npm run gif && npm run stills"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.543",
+    "@remotion/google-fonts": "4.0.543",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "4.0.543"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.9.0"
+  }
+}
