@@ -73,6 +73,15 @@ copies structure, never footage.
    image, text or a React component.
 
 <picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/scene-dark.gif">
+  <img src=".github/assets/scene-light.gif" width="100%" alt="A 3D timeline of the test clip's shot list: nine grey slabs laid end to end, each as long as its shot in frames, a row of thin posts in front for the 29 detected audio onsets, filled discs under the six cuts that land on an onset and rings under the two that do not, and a thin playhead plane sweeping from start to end.">
+</picture>
+
+<sub>The committed analysis of the bundled test clip, drawn from `samples/test-clip.shotlist.json`: shot lengths in frames,
+each shot's measured average colour converted to grey, onset positions and strengths, and the on-beat flag of every cut.
+The clip itself is a synthetic ffmpeg test pattern with a 120 BPM pulse, not a real video.</sub>
+
+<picture>
   <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-04-dark.svg">
   <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-04-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-04-dark.svg">
