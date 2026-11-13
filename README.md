@@ -1,203 +1,222 @@
-# shotlist
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/hero-mobile-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/hero-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/hero-dark.svg">
+  <img src=".github/assets/hero-light.svg" width="100%" alt="shotlist. Shot list and Remotion template from a short video. Prototype, tested on one synthetic clip.">
+</picture>
 
-**Any short video, broken down to the frame. Exported as a Remotion template.**
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-01-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-01-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-01-dark.svg">
+  <img src=".github/assets/rule-01-light.svg" width="100%" alt="01 What it is">
+</picture>
 
-![shotlist: any short video, broken down to the frame, exported as a Remotion template](media/hero.png)
+shotlist measures the edit of a short video: where every cut falls, where the beats are, and how long
+each shot runs. It writes that to one file, `shotlist.json`. It then turns the file into a
+[Remotion](https://remotion.dev) project with one `<Sequence>` per shot, at the same frame and length
+as the source, and an empty slot for your own footage.
 
-## Why
+It is a prototype, version 0.1.0. It has been run on one synthetic test clip. No real video has been
+analysed, and the optional Claude step has not been run end to end.
 
-You can feel that an ad, a TikTok or a trailer works. Seeing why means scrubbing frame by frame with a notepad: where the cuts are, which ones land on the beat, how long the hook runs before the second shot.
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-02-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-02-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-02-dark.svg">
+  <img src=".github/assets/rule-02-light.svg" width="100%" alt="02 Why it exists">
+</picture>
 
-shotlist measures that for you and writes it to one file, `shotlist.json`. Then it turns that file into a [Remotion](https://remotion.dev) project where every shot of the source is a `<Sequence>` with the same start frame and length, and an empty slot for your own footage. The edit is kept. The content is yours.
+**The problem.** You can feel that an ad, a short or a trailer works. Seeing why means scrubbing frame
+by frame with a notepad: where the cuts are, which ones land on the beat, how long the opening runs
+before the second shot.
 
-## How it works
+**What was missing.** A tool that writes those measurements down in a fixed format and hands them to a
+video framework as a starting point. The timing of the edit is kept. The content is yours.
 
-![Pipeline: video, then cuts, beats and hook, then shotlist.json, then a Remotion template](media/how-it-works.svg)
+**Who it is for.** Editors and developers who build videos in Remotion and want to reuse the pacing of
+a reference video with their own material. Use it on videos you have the right to analyse. The template
+copies structure, never footage.
 
-| Step | Tool | What it produces |
-|---|---|---|
-| Metadata | `ffprobe` | Frame rate, frame count, size, codecs |
-| Cuts | `ffmpeg` scene score | The first frame of every shot |
-| Beat map | Onset detection on the decoded audio | Onsets, a tempo estimate, a loudness envelope per frame |
-| Hook and structure | Claude (`claude-fable-5-2`) on one sampled frame per shot | Role, label and slot hint per shot, the hook device, why it works |
-| Template | `shotlist export` | A Remotion project with one `<Sequence>` per shot |
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-03-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-03-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-03-dark.svg">
+  <img src=".github/assets/rule-03-light.svg" width="100%" alt="03 How it works">
+</picture>
 
-Everything except the Claude step runs locally. Without an API key (or with `--no-llm`) the timings are identical and only the roles and labels become position-based guesses.
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/flow-mobile-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/flow-mobile-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/flow-dark.svg">
+  <img src=".github/assets/flow-light.svg" width="100%" alt="Data flow. Measured locally with ffmpeg: ffprobe reads frame rate, frame count and size, ffmpeg's scene score finds the cuts, and onsets and a tempo are detected in the decoded audio. Reading the edit: pacing statistics, one frame from the middle of each shot for its average colour, and roles, labels and the hook from Claude, or guessed from shot position without credentials. Written out: a shotlist.json checked against the schema, exported as a Remotion project with one Sequence per shot and a slot to fill for each.">
+</picture>
 
-## Install
+1. **Probe.** `ffprobe` reads frame rate, frame count, size and codecs. Frame numbers are computed from
+   the average frame rate, so a constant frame rate is assumed.
+2. **Cuts.** `ffmpeg` scores every frame for scene change (`select=gt(scene,T)`, T defaults to 0.3).
+   Each frame above the threshold starts a new shot. Cuts closer than 6 frames to the previous one, or
+   to the end, are dropped.
+3. **Beats.** The audio is decoded to mono 22 050 Hz. The code computes an energy envelope, picks
+   onsets where the energy rises sharply, and estimates a tempo between 60 and 180 BPM by
+   autocorrelation. A cut counts as on the beat when it is within 2 frames of an onset.
+4. **Pacing and colour.** Shot lengths, cuts per minute, the share of cuts on the beat, and whether
+   shots get shorter or longer over the video. One frame from the middle of each shot gives its average
+   colour.
+5. **Structure.** With Claude credentials, one JPEG per shot (at most 60) and the measured numbers go
+   to Claude, which returns a role, label and slot hint per shot, the hook device and a summary. Without
+   credentials, or with `--no-llm`, roles are guessed from shot position. The timings are the same
+   either way.
+6. **Write.** The result is validated against the JSON Schema and written as `shotlist.json`.
+7. **Export.** `shotlist export` copies a Remotion scaffold and generates `Main.tsx` with one
+   `<Sequence>` per shot, and `slots.tsx`, where each slot is filled with a placeholder, a video, an
+   image, text or a React component.
 
-Requirements: Node 22 or newer, and `ffmpeg` plus `ffprobe` on your `PATH`.
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-04-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-04-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-04-dark.svg">
+  <img src=".github/assets/rule-04-light.svg" width="100%" alt="04 Capabilities">
+</picture>
+
+What the code does today.
+
+- **CLI.** `shotlist analyze`, `export` and `validate`, built on commander. `cli/src/index.ts`
+- **Cut detection.** ffmpeg scene score with a tunable threshold and minimum shot length. `cli/src/media.ts`
+- **Beat map.** Hand-written onset detection, tempo estimate and a loudness value per frame. `cli/src/beats.ts`
+- **Captions.** Timing from an SRT or VTT file, or on-screen text read by Claude and timed to its shot.
+  `cli/src/captions.ts`, `cli/src/structure.ts`
+- **Structure.** Claude reading with structured JSON output, plus a position-based fallback.
+  `cli/src/structure.ts`
+- **Schema.** JSON Schema 2020-12, TypeScript types and an ajv validator. `schema/`
+- **Template export.** Remotion 4.0.543 project, one `<Sequence>` per shot. `template/`
+- **Examples.** The raw export of the test clip, and the same export with every slot filled by a
+  component for a made-up coffee brand. `examples/test-clip-template`, `examples/reskinned-template`
+
+Result on the bundled test clip (`samples/test-clip.mp4`, 15 s of ffmpeg test patterns with a 120 BPM
+pulse, made by [`scripts/make-test-clip.mjs`](scripts/make-test-clip.mjs) with cuts at known frames):
+
+| Measure | Result |
+|---|---|
+| Shots found | 9 of 9, at the frames the generator script used |
+| Tempo | about 120.2 BPM |
+| Cuts on the beat | 6 of 8. The two cuts placed off the beat on purpose (3.8 s, 6.3 s) are marked off beat |
+| Real videos analysed | 0 |
+
+Known limits, from the code and the repository's own notes:
+
+- Hard cuts only. Dissolves, wipes and whip pans can be missed. Fast motion and flashes can register
+  as cuts.
+- The beat map marks sudden rises in loudness. It does not track downbeats or soft melodic music, and
+  the tempo is an estimate.
+- Claude sees one still frame per shot. It does not see motion or hear the audio.
+- There are no automated tests and no CI.
+- The template carries timing only. Transitions, camera moves, colour and sound design of the source
+  are not reproduced.
+
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-05-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-05-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-05-dark.svg">
+  <img src=".github/assets/rule-05-light.svg" width="100%" alt="05 Quick start">
+</picture>
+
+Requires Node 22 or newer and `ffmpeg` plus `ffprobe` on your `PATH`. The commands below were run on
+Windows 11 with Node 26.13, npm 11.20 and ffmpeg 9.0.2, in a fresh clone. macOS and Linux were not
+tested.
+
+Install only the three packages the CLI needs. This skips the tutorial and example workspaces, which
+pull in Remotion.
 
 ```bash
-git clone https://github.com/hesselb20-ctrl/shotlist
+git clone https://github.com/hesselb20-ctrl/shotlist.git
 cd shotlist
-npm install
+npm install -w schema -w template -w cli
 npm run build
 ```
 
-For the structure analysis, set a Claude API key:
+Analyse the bundled test clip without Claude. Expect `9 shots, avg 1.67s, 75% of cuts on the beat,
+~120.2 BPM, structure by heuristic`. The `shotlist.json` it writes is byte for byte the committed
+[`samples/test-clip.shotlist.json`](samples/test-clip.shotlist.json).
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+node cli/dist/index.js analyze samples/test-clip.mp4 --no-llm
 ```
 
-## Quickstart
-
-Three commands, run from the repo root. The first uses the bundled test clip; point it at any video ffmpeg can read.
+Check the file against the schema. Expect `valid`.
 
 ```bash
-npx shotlist analyze samples/test-clip.mp4
+node cli/dist/index.js validate shotlist.json
 ```
+
+Export it as a Remotion project. Expect `wrote 16 files to ../my-template`. Apart from the package
+name, the output matches [`examples/test-clip-template`](examples/test-clip-template).
 
 ```bash
-npx shotlist export shotlist.json -o ../my-template
+node cli/dist/index.js export shotlist.json -o ../my-template
 ```
 
-```bash
-cd ../my-template && npm install && npm run dev
-```
+Not run here: installing, previewing or rendering the exported project (`npm install`, `npm run dev`,
+`npm run render` inside it), and `analyze` with Claude credentials set (`ANTHROPIC_API_KEY`). Without
+credentials, `analyze` prints a note and continues as if `--no-llm` was passed. All options are listed
+by `node cli/dist/index.js analyze --help`.
 
-`analyze` prints the shot table and writes `shotlist.json`. This is the output without an API key:
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-06-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-06-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-06-dark.svg">
+  <img src=".github/assets/rule-06-light.svg" width="100%" alt="06 Stack, status, roadmap">
+</picture>
 
-```
-probe    1280x720, 30 fps, 450 frames (15s)
-cuts     8 cuts, 9 shots
-beats    29 onsets, about 120.2 BPM
-claude   skipped (--no-llm): roles and labels are guessed from shot position
-wrote    shotlist.json
+**Stack**
 
-  s01  0.00-1.50s    45f  hook
-  s02  1.50-3.00s    45f  setup   on beat
-  s03  3.00-3.80s    24f  setup   on beat
-  s04  3.80-5.00s    36f  setup   off beat
-  ...
-  9 shots, avg 1.67s, 75% of cuts on the beat, ~120.2 BPM, structure by heuristic
-```
-
-`npm run dev` opens Remotion Studio on the generated project. Fill the slots in `src/slots.tsx`, then `npm run render`.
-
-### Options
-
-| Command | Option | Meaning |
-|---|---|---|
-| `analyze <video>` | `-o, --out <file>` | Output path, default `shotlist.json` |
-| | `-t, --threshold <score>` | Scene score (0 to 1) that counts as a cut, default `0.3`. Lower finds more cuts |
-| | `--min-shot <frames>` | Shortest shot to keep, default `6` |
-| | `--captions <file>` | Take caption timing from an SRT or VTT file |
-| | `--model <id>` | Claude model, default `claude-fable-5-2` |
-| | `--no-llm` | Skip Claude and guess roles from shot position |
-| | `--frames-dir <dir>` | Also save the frames that were sent to Claude |
-| `export <shotlist>` | `-o, --out <dir>` | Directory to create, default `shotlist-template` |
-| | `--name <name>` | Package name of the generated project |
-| | `--force` | Write into a directory that already has files |
-| `validate <shotlist>` | | Check a file against the schema |
-
-## Tutorial
-
-[![Six seconds of the tutorial: cuts being detected on a timeline](media/preview.gif)](media/tutorial.mp4)
-
-Click the preview for the full 74-second video ([media/tutorial.mp4](media/tutorial.mp4), 1920x1080, 30 fps). It is itself a Remotion project, in [`tutorial/`](tutorial), and every number on screen is read from the sample analysis.
-
-## What you get
-
-The annotated shot list of the bundled test clip. Two cuts were placed off the beat on purpose, and the analysis finds both:
-
-![Shot timeline of the test clip with onsets, cut markers and annotations](media/timeline.png)
-
-The source next to the exported template with its slots filled, at the same frame:
-
-![Source clip beside the re-skinned template at frame 232](media/before-after.png)
-
-Both versions are in the repo:
-
-- [`examples/test-clip-template`](examples/test-clip-template) is the untouched output of `shotlist export`.
-- [`examples/reskinned-template`](examples/reskinned-template) is the same export with [`slots.tsx`](examples/reskinned-template/src/slots.tsx) filled in for a made-up coffee brand. `Main.tsx` and its timings are unchanged.
-
-### The sample
-
-`samples/test-clip.mp4` is 15 seconds of ffmpeg test patterns with a tone and a 120 BPM pulse, generated by [`scripts/make-test-clip.mjs`](scripts/make-test-clip.mjs). It contains no third-party material. Its analysis, [`samples/test-clip.shotlist.json`](samples/test-clip.shotlist.json), was produced with `--no-llm`, so its roles and labels are the positional guesses, not Claude's reading. Test patterns have no story to read anyway.
-
-## The schema
-
-`shotlist.json` is described by [`schema/shotlist.schema.json`](schema/shotlist.schema.json) (JSON Schema 2020-12), with a full example in [`schema/example.shotlist.json`](schema/example.shotlist.json). TypeScript types and a validator are exported from `@shotlist/schema`.
-
-Frame numbers are zero-based and counted at `source.fps`. Ranges are `[startFrame, endFrame)`: the end is exclusive.
-
-| Field | Contents |
+| Layer | Built with |
 |---|---|
-| `source` | File name, duration in seconds and frames, fps, size, codecs |
-| `detection` | The settings used: scene threshold, minimum shot length, beat tolerance |
-| `shots[]` | One entry per shot, contiguous, covering the whole video |
-| `hook` | Frame range of the opening, the device it uses, a description |
-| `beats` | `bpm` (or null), `onsets[]` with frame, time and strength, `envelope[]` with one loudness value per frame |
-| `captions[]` | Text with a frame range. `source` is `subtitles` (from an SRT/VTT file) or `vision` (read from a frame, timed to its shot) |
-| `pacing` | Shot count, average, median, shortest and longest shot, cuts per minute, share of cuts on the beat, and whether the pace is `accelerating`, `steady` or `decelerating` |
-| `analysis` | `source` (`claude` or `heuristic`), the model, a summary, and `whyItWorks[]` |
+| CLI | TypeScript, Node 22+, commander, npm workspaces |
+| Media | ffmpeg and ffprobe, called as child processes |
+| Structure step | Anthropic SDK, default model `claude-fable-5-2` |
+| Schema | JSON Schema 2020-12, ajv |
+| Exported template | Remotion 4.0.543, React 19 |
 
-A shot:
+**Status**
 
-```json
-{
-  "id": "s04",
-  "index": 3,
-  "startFrame": 114,
-  "endFrame": 150,
-  "durationFrames": 36,
-  "startSec": 3.8,
-  "endSec": 5,
-  "role": "setup",
-  "label": "Setup shot",
-  "description": "Shot 4 of 9, 1.20s. Role guessed from its position in the edit.",
-  "slot": { "type": "video", "hint": "Context: the problem, the setting or the before state." },
-  "cutOnBeat": false,
-  "dominantColor": "#666666"
-}
-```
-
-`role` is one of `hook`, `setup`, `proof`, `payoff`, `cta`, `other`. `cutOnBeat` is true when the cut into the shot is within `detection.beatToleranceFrames` (2) of an onset.
-
-## Repo layout
-
-| Path | What it is |
+| Part | State |
 |---|---|
-| [`cli/`](cli) | The `shotlist` command: `analyze`, `export`, `validate` |
-| [`template/`](template) | The generator behind `export`, and the scaffold it copies |
-| [`schema/`](schema) | JSON Schema, example, types and validator |
-| [`tutorial/`](tutorial) | Remotion project for the tutorial video and the README images |
-| [`examples/`](examples) | An exported template, raw and re-skinned |
-| [`samples/`](samples) | The test clip and its analysis |
-| [`media/`](media) | Rendered video, GIF and images |
+| Probe, cuts, beats, pacing | Built. Run on one synthetic clip only. |
+| Claude structure step | Built. Never run end to end in this repository. |
+| Heuristic fallback | Built. Produced the committed sample. |
+| Template export | Built. Output matches the committed example. Rendering it was not run here. |
+| Tests and CI | None. |
+| npm package | Not published. |
 
-To rebuild everything in `media/` except the hand-written SVG:
+**Roadmap.** From the repository's previous README:
 
-```bash
-npm run media
-```
+1. An MCP server exposing `analyze` and `export` as tools. It does not exist yet.
+2. Dissolve and fade detection.
+3. Speech-to-text captions with word-level timing.
+4. Downbeat tracking and bar-aware cut statistics.
+5. Several frames per shot for the Claude step, so it can read motion.
+6. A compare mode: several videos in, the pacing patterns they share out.
+7. Publish to npm.
 
-On Windows, clone into a short path first. Remotion's headless browser does not start when its path exceeds 260 characters.
+**Documents**
 
-## Limitations
+| File | Contents |
+|---|---|
+| [`schema/shotlist.schema.json`](schema/shotlist.schema.json) | The file format. Frames are zero-based; ranges are `[startFrame, endFrame)` |
+| [`schema/example.shotlist.json`](schema/example.shotlist.json) | A full example file |
+| [`examples/reskinned-template/README.md`](examples/reskinned-template/README.md) | How to fill the slots of an exported project |
+| [`tutorial/`](tutorial) | Remotion project that renders the tutorial video |
+| [`media/tutorial.mp4`](media/tutorial.mp4?raw=true) | 74-second tutorial video, 1920x1080, 8 MB download |
 
-- **Hard cuts only.** Detection uses ffmpeg's scene score. Dissolves, wipes and whip pans can be missed, and fast motion or flashes can register as cuts. Tune `--threshold` and check the table.
-- **Onsets, not bars.** The beat map marks sudden rises in loudness: drums, claps, hits. It does not track downbeats or follow soft melodic music, and the BPM is an estimate. A sound that starts on the very first frame is not marked as an onset.
-- **Claude sees one frame per shot.** It does not see motion and does not hear the audio, so the hook and role analysis is a reading of stills plus the measured numbers. With more than 60 shots, frames are sampled from every nth shot.
-- **The Claude step is untested end to end in this repo.** The request compiles against the SDK types and the fallback path is exercised by the sample, but the sample itself was made without an API key.
-- **Captions are basic.** Timing comes from an SRT/VTT file you supply, or from on-screen text read from the sampled frame and timed to the whole shot. There is no speech-to-text.
-- **Constant frame rate assumed.** Frame numbers are computed from the average frame rate. Convert variable-frame-rate phone footage first (`ffmpeg -i in.mp4 -fps_mode cfr out.mp4`).
-- **Timing is all the template carries.** Transitions, camera moves, effects, colour and sound design of the source are not reproduced.
-- **Use it on videos you have the right to analyse.** The template copies structure, never footage, and structure alone does not make a video yours to imitate wholesale.
-- Remotion has [its own licence](https://remotion.dev/license): free for individuals and small teams, paid for larger companies.
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-07-dark.svg">
+  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-07-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-07-dark.svg">
+  <img src=".github/assets/rule-07-light.svg" width="100%" alt="07 License">
+</picture>
 
-## Roadmap
+MIT. See [`LICENSE`](LICENSE).
 
-- MCP server exposing `analyze` and `export` as tools, so an agent can break down a reference video and build on the template
-- Dissolve and fade detection
-- Speech-to-text captions with word-level timing
-- Downbeat tracking and bar-aware "cut on the 1" stats
-- Several frames per shot for the Claude step, so it can read motion
-- Compare mode: several videos in, the pacing patterns they share out
-- Publish to npm
-
-## License
-
-[MIT](LICENSE)
+Remotion, which the exported projects depend on, has [its own licence](https://remotion.dev/license).
+The test clip is synthesised by ffmpeg and contains no third-party material.
