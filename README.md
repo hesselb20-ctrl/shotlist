@@ -1,9 +1,10 @@
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/hero-mobile-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/hero-mobile-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/hero-dark.svg">
-  <img src=".github/assets/hero-light.svg" width="100%" alt="shotlist. Shot list and Remotion template from a short video. Prototype, tested on one synthetic clip.">
-</picture>
+# shotlist
+
+Shot list and Remotion template from a short video.
+
+<img src=".github/assets/figure.webp" width="100%" alt="3D chart along the 450 frames of a clip. A loudness curve and picture-change spikes appear first. Planes then drop in at the eight detected cuts, green on a beat and coral off it, with the beats locked at 120.2 BPM. All eight cuts match the true cut frames exactly; six of eight land on a beat.">
+
+<sub>From `samples/test-clip.shotlist.json`, checked against the script that generated the clip. One synthetic test clip; no real video has been tested.</sub>
 
 <picture>
   <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-01-dark.svg">
@@ -45,13 +46,6 @@ copies structure, never footage.
   <img src=".github/assets/rule-03-light.svg" width="100%" alt="03 How it works">
 </picture>
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/flow-mobile-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/flow-mobile-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/flow-dark.svg">
-  <img src=".github/assets/flow-light.svg" width="100%" alt="Data flow. Measured locally with ffmpeg: ffprobe reads frame rate, frame count and size, ffmpeg's scene score finds the cuts, and onsets and a tempo are detected in the decoded audio. Reading the edit: pacing statistics, one frame from the middle of each shot for its average colour, and roles, labels and the hook from Claude, or guessed from shot position without credentials. Written out: a shotlist.json checked against the schema, exported as a Remotion project with one Sequence per shot and a slot to fill for each.">
-</picture>
-
 1. **Probe.** `ffprobe` reads frame rate, frame count, size and codecs. Frame numbers are computed from
    the average frame rate, so a constant frame rate is assumed.
 2. **Cuts.** `ffmpeg` scores every frame for scene change (`select=gt(scene,T)`, T defaults to 0.3).
@@ -71,15 +65,6 @@ copies structure, never footage.
 7. **Export.** `shotlist export` copies a Remotion scaffold and generates `Main.tsx` with one
    `<Sequence>` per shot, and `slots.tsx`, where each slot is filled with a placeholder, a video, an
    image, text or a React component.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/scene-dark.gif">
-  <img src=".github/assets/scene-light.gif" width="100%" alt="A 3D timeline of the test clip's shot list: nine grey slabs laid end to end, each as long as its shot in frames, a row of thin posts in front for the 29 detected audio onsets, filled discs under the six cuts that land on an onset and rings under the two that do not, and a thin playhead plane sweeping from start to end.">
-</picture>
-
-<sub>The committed analysis of the bundled test clip, drawn from `samples/test-clip.shotlist.json`: shot lengths in frames,
-each shot's measured average colour converted to grey, onset positions and strengths, and the on-beat flag of every cut.
-The clip itself is a synthetic ffmpeg test pattern with a 120 BPM pulse, not a real video.</sub>
 
 <picture>
   <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-04-dark.svg">
