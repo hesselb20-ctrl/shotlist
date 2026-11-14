@@ -51,6 +51,10 @@ copies structure, never footage.
    `<Sequence>` per shot, and `slots.tsx`, where each slot is filled with a placeholder, a video, an
    image, text or a React component.
 
+<img src=".github/assets/figure-how.webp" width="100%" alt="Two tracks over 450 frames: eight picture-change spikes cross a 0.3 line and become cuts, 29 audio peaks become beats, then each cut is checked against the beats: six on beat, two missing by 6 frames.">
+
+<sub>Values from the bundled synthetic test clip; re-running the repo's onset detection reproduces the committed 29 onsets. No real video tested.</sub>
+
 ## Capabilities
 
 What the code does today.
@@ -87,6 +91,10 @@ Known limits, from the code and the repository's own notes:
 - There are no automated tests and no CI.
 - The template carries timing only. Transitions, camera moves, colour and sound design of the source
   are not reproduced.
+
+<img src=".github/assets/figure-more.webp" width="100%" alt="A strip of nine measured shots drops into nine template slots coloured by role, with every boundary matching; status chips read 1 synthetic clip, 0 real videos, Claude step never run, template render not run.">
+
+<sub>Slot timings from the committed example template match the analysed shots frame for frame. Roles guessed by position, not by a model.</sub>
 
 ## Quick start
 
