@@ -6,12 +6,7 @@ Shot list and Remotion template from a short video.
 
 <sub>From `samples/test-clip.shotlist.json`, checked against the script that generated the clip. One synthetic test clip; no real video has been tested.</sub>
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-01-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-01-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-01-dark.svg">
-  <img src=".github/assets/rule-01-light.svg" width="100%" alt="01 What it is">
-</picture>
+## What it is
 
 shotlist measures the edit of a short video: where every cut falls, where the beats are, and how long
 each shot runs. It writes that to one file, `shotlist.json`. It then turns the file into a
@@ -21,12 +16,7 @@ as the source, and an empty slot for your own footage.
 It is a prototype, version 0.1.0. It has been run on one synthetic test clip. No real video has been
 analysed, and the optional Claude step has not been run end to end.
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-02-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-02-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-02-dark.svg">
-  <img src=".github/assets/rule-02-light.svg" width="100%" alt="02 Why it exists">
-</picture>
+## Why it exists
 
 **The problem.** You can feel that an ad, a short or a trailer works. Seeing why means scrubbing frame
 by frame with a notepad: where the cuts are, which ones land on the beat, how long the opening runs
@@ -39,12 +29,7 @@ video framework as a starting point. The timing of the edit is kept. The content
 a reference video with their own material. Use it on videos you have the right to analyse. The template
 copies structure, never footage.
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-03-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-03-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-03-dark.svg">
-  <img src=".github/assets/rule-03-light.svg" width="100%" alt="03 How it works">
-</picture>
+## How it works
 
 1. **Probe.** `ffprobe` reads frame rate, frame count, size and codecs. Frame numbers are computed from
    the average frame rate, so a constant frame rate is assumed.
@@ -66,12 +51,7 @@ copies structure, never footage.
    `<Sequence>` per shot, and `slots.tsx`, where each slot is filled with a placeholder, a video, an
    image, text or a React component.
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-04-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-04-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-04-dark.svg">
-  <img src=".github/assets/rule-04-light.svg" width="100%" alt="04 Capabilities">
-</picture>
+## Capabilities
 
 What the code does today.
 
@@ -108,12 +88,7 @@ Known limits, from the code and the repository's own notes:
 - The template carries timing only. Transitions, camera moves, colour and sound design of the source
   are not reproduced.
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-05-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-05-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-05-dark.svg">
-  <img src=".github/assets/rule-05-light.svg" width="100%" alt="05 Quick start">
-</picture>
+## Quick start
 
 Requires Node 22 or newer and `ffmpeg` plus `ffprobe` on your `PATH`. The commands below were run on
 Windows 11 with Node 26.13, npm 11.20 and ffmpeg 9.0.2, in a fresh clone. macOS and Linux were not
@@ -155,12 +130,7 @@ Not run here: installing, previewing or rendering the exported project (`npm ins
 credentials, `analyze` prints a note and continues as if `--no-llm` was passed. All options are listed
 by `node cli/dist/index.js analyze --help`.
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-06-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-06-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-06-dark.svg">
-  <img src=".github/assets/rule-06-light.svg" width="100%" alt="06 Stack, status, roadmap">
-</picture>
+## Stack, status, roadmap
 
 **Stack**
 
@@ -203,12 +173,7 @@ by `node cli/dist/index.js analyze --help`.
 | [`tutorial/`](tutorial) | Remotion project that renders the tutorial video |
 | [`media/tutorial.mp4`](media/tutorial.mp4?raw=true) | 74-second tutorial video, 1920x1080, 8 MB download |
 
-<picture>
-  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset=".github/assets/rule-mobile-07-dark.svg">
-  <source media="(max-width: 600px)" srcset=".github/assets/rule-mobile-07-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/rule-07-dark.svg">
-  <img src=".github/assets/rule-07-light.svg" width="100%" alt="07 License">
-</picture>
+## License
 
 MIT. See [`LICENSE`](LICENSE).
 
